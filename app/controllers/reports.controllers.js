@@ -1,5 +1,7 @@
 const ReportEntry = require('../models/reports.model.js');
 const uuidv1 = require('uuid/v1');
+nodeMailer = require('nodemailer'),
+
 
 exports.getReportsByProjectAndDateRange = (req, res) => {
     const startDate = new Date(req.params.startDate).toISOString();
@@ -188,13 +190,41 @@ exports.submitReport = (req, res) => {
         })
         reportEntry.save()
         .then(data => {
-            // TODO: Write code to send email here
+            
             res.send("Report saved successfully")
         }).catch(err => {
             res.status(500).send({
-                message: err.message || "An error occurred while creating the Note."
+                message: err.message || "An error occurred while creating a report entry"
             })
         })
+
+    });
+
+    const userName = report[0].userName;
+    const timestamp = Date.now();
+
+    let transporter = nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'user',
+            pass: 'password'
+        }
+    });
+    let mailOptions = {
+        from: '"Mukesh Bhatia" <xx@gmail.com>', // sender address
+        to: "ritesh.7792@gmail.com", // list of receivers
+        subject: "Report submission notification", // Subject line
+        text: "Hi, your employee" + userName + " has submitted a report at " + timestamp, // plain text body
+        html: "<b>Hi, your employee " + userName + " has submitted a report at " + timestamp + "</b>" // html body
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
     });
 };
 
