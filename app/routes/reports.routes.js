@@ -7,7 +7,12 @@ module.exports = (app) => {
     // Retrieve all Notes
     app.post('/reports/submitReport', reports.submitReport);
 
-    app.get('/reports/:userName/:startDate/:endDate', reports.getReportsByUserAndDateRange)
+    app.get('/reports/byuser/:userName/:startDate/:endDate', reports.getReportsByUserAndDateRange)
+
+    app.get('/reports/byuser/:userName/:projectName/:startDate/:endDate', reports.getReportsByUserProjectAndDateRange)
+
+    app.get('/reports/byproject/:projectName/:startDate/:endDate', reports.getReportsByProjectAndDateRange)
+
 
     // Retrieve a single Note with noteId
     app.get('/reports/:userName', reports.findOne);

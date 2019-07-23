@@ -1,6 +1,116 @@
 const ReportEntry = require('../models/reports.model.js');
 const uuidv1 = require('uuid/v1');
 
+exports.getReportsByProjectAndDateRange = (req, res) => {
+    const startDate = new Date(req.params.startDate).toISOString();
+    const endDate = new Date(req.params.endDate).toISOString();
+    const projectName = req.params.projectName;
+
+    ReportEntry.find(
+        {
+           dateOfEntry:{ $gte: startDate, $lte: endDate},
+           projectName: projectName 
+        }
+    )
+    .then(reportEntries => {
+        if(!reportEntries) {
+            return res.status(404).send({
+                message: "No reports found for given user and date range"
+            });            
+        }
+
+        console.log("PRinting report entries")
+        console.log(reportEntries)
+
+        let reportDictionary = {}
+
+        reportEntries.forEach(element => {
+            if (reportDictionary[element.reportId] === undefined) {
+                var entryList = []
+                entryList.push(element)
+                reportDictionary[element.reportId] = entryList
+                console.log(reportDictionary)
+            } else {
+                var entryList = reportDictionary[element.reportId]
+                entryList.push(element)
+                reportDictionary[element.reportId] = entryList;
+            }
+        })
+
+        console.log('printing reports')
+
+        console.log(reportDictionary)
+        res.send(reportDictionary);
+    }).catch(err => {
+        console.log("Printing error")
+        console.log(err)
+        if(err.kind === 'ObjectId') {
+            
+            return res.status(404).send({
+                message: "No reports found"
+            });                
+        }
+        return res.status(500).send({
+            message: "No reports found"        });
+    });
+}
+
+exports.getReportsByUserProjectAndDateRange = (req, res) => {
+    const userName = req.params.userName;
+    const startDate = new Date(req.params.startDate).toISOString();
+    const endDate = new Date(req.params.endDate).toISOString();
+    const projectName = req.params.projectName;
+
+    ReportEntry.find(
+        {
+           userName: userName, 
+           dateOfEntry:{ $gte: startDate, $lte: endDate},
+           projectName: projectName 
+        }
+    )
+    .then(reportEntries => {
+        if(!reportEntries) {
+            return res.status(404).send({
+                message: "No reports found for given user and date range"
+            });            
+        }
+
+        console.log("PRinting report entries")
+        console.log(reportEntries)
+
+        let reportDictionary = {}
+
+        reportEntries.forEach(element => {
+            if (reportDictionary[element.reportId] === undefined) {
+                var entryList = []
+                entryList.push(element)
+                reportDictionary[element.reportId] = entryList
+                console.log(reportDictionary)
+            } else {
+                var entryList = reportDictionary[element.reportId]
+                entryList.push(element)
+                reportDictionary[element.reportId] = entryList;
+            }
+        })
+
+        console.log('printing reports')
+
+        console.log(reportDictionary)
+        res.send(reportDictionary);
+    }).catch(err => {
+        console.log("Printing error")
+        console.log(err)
+        if(err.kind === 'ObjectId') {
+            
+            return res.status(404).send({
+                message: "No reports found"
+            });                
+        }
+        return res.status(500).send({
+            message: "No reports found"        });
+    });
+}
+
 exports.getReportsByUserAndDateRange = (req, res) => {
     const userName = req.params.userName;
     const startDate = new Date(req.params.startDate).toISOString();
